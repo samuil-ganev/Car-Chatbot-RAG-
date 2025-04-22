@@ -1,0 +1,7 @@
+*.md filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
+assets/chunks/chunks.json filter=lfs diff=lfs merge=lfs -text
+assets/chunks/chunks.pkl filter=lfs diff=lfs merge=lfs -text
+assets/vector_store/docstore.json filter=lfs diff=lfs merge=lfs -text
+assets/vector_store/default__vector_store.json filter=lfs diff=lfs merge=lfs -text
+assets/vector_store/faiss.index filter=lfs diff=lfs merge=lfs -text
