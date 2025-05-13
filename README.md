@@ -49,9 +49,10 @@ This project implements a Retrieval Augmented Generation (RAG) Question Answerin
     ```
 
 4.  **Set Up Environment Variables:**
-    You need to have credentials.json file in assets/secrets/
+    You need a `credentials.json` file within the `assets/secrets/` directory.
+    The `credentials.json` file should contain necessary credentials.
 
-5.  **Run the Streamlit Application:**
+6.  **Run the Streamlit Application:**
     Start the Streamlit application:
     ```bash
     streamlit run .\frontend\app.py
