@@ -1,8 +1,10 @@
+'''Module for connecting to the llm.'''
 import json
 from gen_ai_hub.proxy.langchain.openai import ChatOpenAI
 from gen_ai_hub.proxy.core.proxy_clients import get_proxy_client
 
 class LLMConnector:
+    '''Uses credentials to connect to the llm.'''
     def __init__(self, credentials_path: str, model_name: str = 'gpt-4o', temperature: float = 0.0):
         with open(credentials_path, 'r') as f:
             creds = json.load(f)
@@ -22,5 +24,6 @@ class LLMConnector:
         )
 
     def generate_answer(self, prompt: str) -> str:
+        '''Invoking the llm.'''
         return self.llm.invoke(prompt).content
-
+    

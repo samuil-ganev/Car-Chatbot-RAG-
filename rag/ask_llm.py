@@ -1,21 +1,25 @@
+'''Module for prompting the llm.'''
 import logging
 from typing import List, Tuple
 from llama_index.core.schema import NodeWithScore
 from rag.llm_connector import LLMConnector
 
-
 class CarAssistant:
-    def __init__(self, query: str, nodes: List[NodeWithScore], credentials_path: str = 'credentials.json') -> None:
+    '''Class for defining the prompt to the llm.'''
+    def __init__(self, query: str, nodes: List[NodeWithScore],
+                 credentials_path: str = 'credentials.json') -> None:
         self.query = query
         self.nodes = nodes
         self.credentials_path = credentials_path
         self.llm = LLMConnector(credentials_path)
 
     def set_nodes(self, new_nodes: List[NodeWithScore]):
+        '''Updates the nodes.'''
         logging.info('Updating nodes')
         self.nodes = new_nodes
 
     def set_query(self, new_query: str):
+        '''Updates the query.'''
         logging.info('Query updated')
         self.query = new_query
 
@@ -23,7 +27,6 @@ class CarAssistant:
         if not self.nodes:
             logging.warning('No context provided to build prompt.')
             return ''
-        
         context = '\n\n'.join([
             node.node.get_content()
             for node in self.nodes
@@ -52,6 +55,7 @@ class CarAssistant:
         return prompt
 
     def get_answer(self) -> Tuple[str, str]:
+        '''Returns the answer. If no prompt is given it returns a defined answer.'''
         prompt = self._build_prompt()
 
         if not prompt:
@@ -66,5 +70,6 @@ class CarAssistant:
             ])
             return answer, retrieved_chunks
         except Exception as e:
-            logging.error(f'Failed to get LLM response: {e}', exc_info=True)
+            logging.error('Failed to get LLM response: %s', e, exc_info=True)
             return 'An error occurred while contacting the LLM.', ''
+        

@@ -1,8 +1,11 @@
-from llm_connector import LLMConnector
+'''Evaluates RAG model answers using an LLM.
+Processes interaction logs and writes structured evaluations to a JSON file.'''
 import json
 import time
 from pathlib import Path
 import sys
+from llm_connector import LLMConnector
+
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
@@ -79,7 +82,6 @@ def get_llm_evaluation(question: str, contexts: str, answer: str) -> dict:
 
             evaluation_data = json.loads(response_content)
             return evaluation_data
-        
         except Exception as e:
             print(f'An unexpected error occurred with LLM (Attempt {attempt+1}/{MAX_RETRIES}): {e}')
             if attempt == MAX_RETRIES - 1:
@@ -90,6 +92,8 @@ def get_llm_evaluation(question: str, contexts: str, answer: str) -> dict:
 
 
 def main():
+    '''Reads interaction logs,
+      evaluates each entry using an LLM, and writes results to an output file.'''
     evaluated_count = 0
     try:
         with open(LOGS_PATH, 'r', encoding='utf-8') as infile, \
@@ -100,7 +104,8 @@ def main():
                     data = json.loads(line.strip())
                 except json.JSONDecodeError:
                     print(f'Skipping malformed JSON line {i+1}: {line.strip()}')
-                    error_entry = {'original_line_number': i+1, 'error': 'Malformed JSON', 'raw_line': line.strip()}
+                    error_entry = {'original_line_number': i+1, 'error': 'Malformed JSON',
+                                    'raw_line': line.strip()}
                     outfile.write(json.dumps(error_entry) + '\n')
                     continue
 
@@ -110,8 +115,10 @@ def main():
                 # timestamp = data.get('timestamp')
 
                 if not all([question, answer, contexts]):
-                    print(f'Skipping line {i+1} due to missing \'question\', \'answer\', or \'contexts\'')
-                    error_entry = {'original_line_number': i+1, 'error': 'Missing critical fields', 'data': data}
+                    print('Skipping line' +
+                          f'{i+1} due to missing \'question\', \'answer\', or \'contexts\'')
+                    error_entry = {'original_line_number': i+1,
+                                    'error': 'Missing critical fields', 'data': data}
                     outfile.write(json.dumps(error_entry) + '\n')
                     continue
 
@@ -132,7 +139,8 @@ def main():
                 outfile.write(json.dumps(output_entry) + '\n')
                 outfile.flush()
                 evaluated_count += 1
-                print(f'  Evaluation for entry {i+1} completed. Result: {evaluation.get('overall_assessment', 'N/A')}')
+                print('Evaluation for entry' +
+                      f"{i+1} completed. Result: {evaluation.get('overall_assessment', 'N/A')}")
 
     except FileNotFoundError:
         print(f'Error: Input file \'{LOGS_PATH}\' not found')
@@ -141,7 +149,7 @@ def main():
         print(f'An unexpected error occurred during file processing: {e}')
         return
 
-    print(f'\n--- Evaluation Complete ---')
+    print('\n--- Evaluation Complete ---')
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

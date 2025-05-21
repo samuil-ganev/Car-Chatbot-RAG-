@@ -1,14 +1,14 @@
 import json
-import streamlit as st
 import re
 from datetime import datetime
 from pathlib import Path
 import sys
+import streamlit as st
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from rag.ask_llm import CarAssistant 
+from rag.ask_llm import CarAssistant
 from rag.search import *
 
 CREDENTIALS_PATH = project_root / 'assets' / 'secrets' / 'credentials.json'
@@ -18,7 +18,6 @@ def log_interaction(query, answer, chunks, prompt):
     '''
     Logs the interaction with query, answer, context, chunks and the prompt used
     '''
-    
     log_entry = {
         'question': query,
         'answer': answer,
@@ -26,12 +25,13 @@ def log_interaction(query, answer, chunks, prompt):
         'prompt': prompt,
         'timestamp': datetime.now().isoformat()
     }
-    
     with open(LOGS_PATH, 'a', encoding='utf-8') as f:
         f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
 
 @st.cache_resource
 def initialize_resources():
+    '''Initializes model.
+    '''
     model = initialize_embed_model(
         model_name='BAAI/bge-base-en-v1.5',
         device=None,
@@ -68,16 +68,18 @@ class RAGCarChatbotApp:
             role = 'User' if msg['role'] == 'user' else 'Assistant'
             history_str += f'{role}: {msg['content']}\n'
         return history_str.strip()
-    
+
     def _get_standalone_query(self, current_query: str):
         if not st.session_state.chat_history:
             return current_query
-        
+
         chat_history_str = self._get_chat_history_for_prompt(last_n=3)
 
-        rephrase_prompt = f'''You are a query rewriting expert. Your task is to rephrase the "Follow-up Question" to be a standalone question that incorporates necessary context from the "Chat History".
-                            If the "Follow-up Question" is already standalone or the history does not seem relevant to it, return the original "Follow-up Question" unchanged.
-                            Only output the rephrased standalone question, without any preamble or explanation.
+        rephrase_prompt = f'''You are a query rewriting expert. Your task is to rephrase the
+        "Follow-up Question" to be a standalone question that incorporates necessary context 
+        from the "Chat History". If the "Follow-up Question" is already standalone or the 
+        history does not seem relevant to it, return the original "Follow-up Question" unchanged.
+        Only output the rephrased standalone question, without any preamble or explanation.
 
                             Chat History:
                             {chat_history_str}
@@ -85,12 +87,12 @@ class RAGCarChatbotApp:
                             Follow-up Question: {current_query}
 
                             Standalone Question:'''
-        
         standalone_query = self.assistant.llm.generate_answer(rephrase_prompt).strip()
         print(f'Original query: {current_query}\nStandalone query: {standalone_query}')
         return standalone_query
 
     def run(self):
+        '''Defines prompt and query, fetches the results and chat history.'''
         query = st.chat_input('Ask something...')
         standalone_query = self._get_standalone_query(query)
 
@@ -115,9 +117,8 @@ class RAGCarChatbotApp:
             User Question: "{standalone_query}"
             Optimized Search Statement:
         '''
-        
         query_to_statement = self.assistant.llm.generate_answer(prompt)
-        
+
         if query:
             st.session_state.chat_history.append({'role': 'user', 'content': query})
 
@@ -137,7 +138,6 @@ class RAGCarChatbotApp:
                     retrieved_chunks = None
 
                 log_interaction(standalone_query, answer, retrieved_chunks, prompt)
-                
             else:
                 answer = "Sorry, I couldn't find relevant information."
                 retrieved_chunks = None

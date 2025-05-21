@@ -1,25 +1,29 @@
-import pytest
+'''Unit tests for embedding model initialization, vector index loading,
+and search functionality.'''
 import sys
 from pathlib import Path
+#import pytest
+
+from rag.search import initialize_embed_model, load_vector_index, search_in_index
+
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-EMBEDDING_MODEL_PATH = str(project_root / 'assets' / 'embedding_model' / 'BAAI/bge-base-en-v1.5')
-
-from rag.search import initialize_embed_model, load_vector_index, search_in_index
-
 def test_embed_model_initializes():
-    model = initialize_embed_model(EMBEDDING_MODEL_PATH, None, {})
+    '''Tests that the embedding model initializes correctly.'''
+    model = initialize_embed_model('BAAI/bge-base-en-v1.5', None, {})
     assert model is not None
 
 def test_load_vector_index_returns_index():
-    embed_model = initialize_embed_model(EMBEDDING_MODEL_PATH, None, {})
+    '''Tests that the vector index loads correctly using the embedding model.'''
+    embed_model = initialize_embed_model('BAAI/bge-base-en-v1.5', None, {})
     index = load_vector_index(embed_model)
     assert index is not None
 
 def test_search_returns_results():
-    embed_model = initialize_embed_model(EMBEDDING_MODEL_PATH, None, {})
+    '''Tests that the search function returns a list of results.'''
+    embed_model = initialize_embed_model('BAAI/bge-base-en-v1.5', None, {})
     index = load_vector_index(embed_model)
     results = search_in_index('why there is a problem with the engine of my honda?', index)
     assert isinstance(results, list)

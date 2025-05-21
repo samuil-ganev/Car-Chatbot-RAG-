@@ -1,11 +1,10 @@
 import logging
-import re
 import uuid
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
 from llama_index.core.node_parser import MarkdownNodeParser
-from llama_index.core.schema import Document, BaseNode, TextNode
+from llama_index.core.schema import Document, TextNode
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -44,8 +43,8 @@ class TextChunker:
         logging.info('TextChunker initialized with recursive splitter')
 
     def _extract_model_name(self, text: str, filename: str) -> str:
-        '''Detect car model from text or filename. Defaults to "Volkswagen".'''
-        
+        '''Detect car model from text or filename. Defaults to 'Volkswagen'.'''
+
         known_models = ['Ford Mustang', 'Daewoo Matiz', 'Honda', 'Subaru', 'Ford', 'Volkswagen']
         text_norm = text.lower()
         fn_norm = filename.lower().replace('-', ' ').replace('_', ' ')
@@ -56,13 +55,13 @@ class TextChunker:
 
     def chunk_markdown_file(self, md_path: Path) -> Optional[List[TextNode]]:
         '''Split a Markdown file into size-bounded TextNode chunks.'''
-        
+
         if not md_path.is_file() or md_path.suffix.lower() != '.md':
-            logging.warning(f'Skipping non-markdown file: {md_path}')
+            logging.warning('Skipping non-markdown file: %s', md_path)
             return None
 
         try:
-            logging.info(f'Chunking file: {md_path.name}')
+            logging.info('Chunking file: %s', md_path.name)
             content = md_path.read_text(encoding='utf-8', errors='ignore')
             model_name = self._extract_model_name(content, md_path.name)
 
@@ -106,18 +105,18 @@ class TextChunker:
                     )
                     final_nodes.append(node)
 
-            logging.info(f'Produced {len(final_nodes)} chunks for {md_path.name}')
+            logging.info('Produced %d chunks for %s', len(final_nodes), md_path.name)
             return final_nodes
 
         except Exception as e:
-            logging.error(f'Error processing {md_path.name}: {e}', exc_info=True)
+            logging.error('Error processing %s: %s', md_path.name, e, exc_info=True)
             return None
 
     def chunk_dir(self, dir: Path) -> Dict[str, List[TextNode]]:
         '''Process all Markdown files in a directory.'''
-        
+
         if not dir.is_dir():
-            logging.error(f'Directory not found: {dir}')
+            logging.error('Directory not found: %s', dir)
             return {}
 
         all_chunks = {}
@@ -127,5 +126,5 @@ class TextChunker:
                 all_chunks[md_file.name] = chunks
 
         total = sum(len(c) for c in all_chunks.values())
-        logging.info(f'Total chunks across directory: {total}')
+        logging.info('Total chunks across directory: %d', total)
         return all_chunks
