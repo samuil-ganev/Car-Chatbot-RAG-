@@ -1,0 +1,17 @@
+# Git
+.git/
+.gitattributes
+.gitignore
+.github/
+
+# Python
+__pycache__/
+.env
+env/
+venv/
+
+# Tests
+tests/
+
+# Secrets
+assets/secrets/
