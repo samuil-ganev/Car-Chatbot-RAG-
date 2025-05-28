@@ -88,7 +88,7 @@ This method containerizes the application, making it portable. It uses the proje
 
 1.  **Clone the Repository (if not already done):**
     ```bash
-    git clone https://github.wdf.sap.corp/C5397307/RAG.git
+    git clone https://github.com/samuil-ganev/Car-Chatbot-RAG-.git RAG
     cd RAG
     ```
 
