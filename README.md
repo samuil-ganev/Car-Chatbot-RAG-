@@ -16,7 +16,7 @@ This project implements a Retrieval Augmented Generation (RAG) Question Answerin
 1.  **Clone the Repository:**
     Open your terminal or command prompt and run:
     ```bash
-    git clone https://github.wdf.sap.corp/C5397307/RAG.git
+    git clone https://github.com/samuil-ganev/Car-Chatbot-RAG-.git RAG
     cd RAG
     ```
 
